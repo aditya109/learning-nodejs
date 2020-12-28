@@ -279,11 +279,225 @@ Now the reason why this must have happened is when you imagine all 14 `crypto.pb
 
 #### Changing Threadpool Size
 
+We do that by using `process.env.UV_THREADPOOL_SIZE = 5;`, by default, it is set to 4.
 
+```js
+process.env.UV_THREADPOOL_SIZE = 5;    /// <<<----
 
+const crypto = require('crypto');
 
+const start = Date.now();
+crypto.pbkdf2("a", 'b', 1000000, 512, 'sha512', () => {
+        console.log('1:', Date.now() - start);
+});
+crypto.pbkdf2("a", 'b', 1000000, 512, 'sha512', () => {
+        console.log('2:', Date.now() - start);
+});
+```
 
+FAQ ❓
 
+- Can we use the threadpool for JS code or can only NodeJS functions use it? **YES**
+
+- What functions in node standard library use the threadpool? **Depends on OS, all `fs` module function, some `crypto` stuff.**
+
+- How does this threadpool stuff fit into the event loop? **Tasks running in the threadpool are the `pendingOperations`** **in our code example.**
+
+  
+
+### Explaining OS Operations
+
+#### Libuv OS Delegations
+
+Let's check how much time do we require to grab [google.com](google.com) via NodeJS.
+
+```js
+const https = require('https');
+
+const start = Date.now();
+
+https.request('https://www.google.com', res => {
+        res.on('data', () => { });
+        res.on('end', () => {
+                console.log(Date.now() - start);
+        });
+}).end();
+```
+
+ The output is:
+
+```
+384
+```
+
+Let's change this code a bit. We will chain the number of function calls:
+
+```js
+const https = require('https');
+
+const start = Date.now();
+
+function doRequest() {
+        https.request('https://www.google.com', res => {
+                res.on('data', () => { });
+                res.on('end', () => {
+                        console.log(Date.now() - start);
+                });
+        }).end();
+}
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+doRequest();
+```
+
+The output is:
+
+```
+376
+383
+389
+391
+396
+402
+```
+
+A plausible explanation for this:
+
+````
+👇 JavaScript code we write
+
+👇 pbkdf2() -- Node's crypto module
+
+👉 V8
+
+👆 libuv -- Node's C++ side
+
+👆 OS async helpers
+````
+
+FAQ ❓
+
+- What functions in Node Standard lib use the OS's async features? **Depends on OS, but almost everything related to OS.**
+- How does this OS async stuff fit into the event loop? **Tasks using the underlying OS are reflected in our `pendingOSTasks` array.**
+
+### Crazy Node Behavior
+
+Let's try some crazy shit. Take a look below:
+
+```js
+const https = require('https');
+const crypto = require('crypto');
+const fs = require('fs');
+
+const start = Date.now();
+
+function doRequest() {
+        https.request('https://www.google.com', res => {
+                res.on('data', () => { });
+                res.on('end', () => {
+                        console.log(Date.now() - start);
+                });
+        }).end();
+}
+
+function doHash(t) {
+        crypto.pbkdf2("a", 'b', 100000, 512, 'sha512', () => {
+                console.log(t, ' Hash :', Date.now() - start);
+        });
+}
+
+doRequest();
+
+fs.readFile('multitask.js', 'utf8', () => {
+        console.log('FS:', Date.now() - start);
+})
+
+doHash(1);
+doHash(2);
+doHash(3);
+doHash(4);
+```
+
+The output observed is as follows:
+
+```
+402
+4  Hash : 681
+FS: 682
+3  Hash : 705
+1  Hash : 722
+2  Hash : 729
+```
+
+Let's just see if reading from HDD actually takes 682 ms.
+
+```js
+const https = require('https');
+const crypto = require('crypto');
+const fs = require('fs');
+
+const start = Date.now();
+
+function doRequest() {
+        https.request('https://www.google.com', res => {
+                res.on('data', () => { });
+                res.on('end', () => {
+                        console.log(Date.now() - start);
+                });
+        }).end();
+}
+
+function doHash(t) {
+        crypto.pbkdf2("a", 'b', 100000, 512, 'sha512', () => {
+                console.log(t, ' Hash :', Date.now() - start);
+        });
+}
+
+doRequest();
+
+fs.readFile('multitask.js', 'utf8', () => {
+        console.log('FS:', Date.now() - start);
+})
+
+// doHash(1);
+// doHash(2);
+// doHash(3);
+// doHash(4);
+```
+
+The output is:
+
+```
+FS: 28
+412
+```
+
+As it can be seen, it is not so.
+
+Explaining the former anomaly.
+Well there is a specific observation which were made during this.
+
+No matter how many times the former program is run, the following order is maintained.
+- First Network call is made.
+- Second atleast one hash is run.
+- Followed by the file system call.
+- Followed by the remaining hashes.
+
+Threadpool is used by `fs` module but `https` uses OS.
+
+Re-looking at the output, gives us a sort of picture:
+
+```
+402
+4  Hash : 681
+FS: 682
+3  Hash : 705
+1  Hash : 722
+2  Hash : 729
+```
 
 
 
