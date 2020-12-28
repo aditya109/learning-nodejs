@@ -279,7 +279,7 @@ Now the reason why this must have happened is when you imagine all 14 `crypto.pb
 
 #### Changing Threadpool Size
 
-We do that by using `process.env.UV_THREADPOOL_SIZE = 5;`, by default, it is set to 4.
+We do that by using `process.env.UV_THREADPOOL_SIZE = 5`, **by default, it is set to 4.**
 
 ```js
 process.env.UV_THREADPOOL_SIZE = 5;    /// <<<----
@@ -486,7 +486,7 @@ No matter how many times the former program is run, the following order is maint
 - Followed by the file system call.
 - Followed by the remaining hashes.
 
-Threadpool is used by `fs` module but `https` uses OS.
+Actually, **Threadpool is used by `fs` module but `https` uses OS.**
 
 Re-looking at the output, gives us a sort of picture:
 
@@ -499,13 +499,44 @@ FS: 682
 2  Hash : 729
 ```
 
+So, the HTTP call resolved right away, but the rest took a while to complete. This is for the ones which were Threadpool dependent.
 
+Let's understand what happens when we call `readFile()`.
 
+```
+👇 We call fs.readFile()
 
+👇 Node gets some 'stats' on the file (requires HD access)
 
+👇 HD accessed, stats returned						⬅ Big system pause observed here
 
+👇 Node requests to read the file
 
+👇 HD accessed, file contents streamed back to app	⬅ Big system pause observed here
 
+👇 Node returns file contents to us
+```
+
+So the scheduling happens where the system pause is observed. `http` module call is done separately so the time of execution is independent of the scheduling.
+
+Let's say that here there were 4 threads which were used.
+
+Let us assume that `Thread #1` was performing `fs` task, so it sent a `stat-request` to HD, and is now waiting. So, since it was sitting *idle*, `crypto.pbkdf2 #4` was scheduled on it.
+
+Meanwhile, `Thread #2`, `#3`, `#4` were performing `crypto.pbkdf2() #1`, `#2`and `#3` respectively. 
+
+Now let's say that the `Thread #2` was finished with `crypto.pbkdf2() #1`, it will start to work on `fs` module left-over task, receiving the `stat-response` from HD.
+
+Again, `Thread #2` goes idle, when the contents' streaming starts. Once streaming is complete, the `console.log()` is seen. Hence the above output:
+
+```
+402
+4  Hash : 681
+FS: 682
+3  Hash : 705
+1  Hash : 722
+2  Hash : 729
+```
 
 
 
