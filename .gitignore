@@ -1,37 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/node,react,angular
-# Edit at https://www.toptal.com/developers/gitignore?templates=node,react,angular
-
-### Angular ###
-## Angular ##
-# compiled output
-dist/
-tmp/
-app/**/*.js
-app/**/*.js.map
-
-# dependencies
-node_modules/
-bower_components/
-
-# IDEs and editors
-.idea/
-
-# misc
-.sass-cache/
-connect.lock/
-coverage/
-libpeerconnection.log/
-npm-debug.log
-testem.log
-typings/
-
-# e2e
-e2e/*.js
-e2e/*.map
-
-# System Files
-.DS_Store/
+# Created by https://www.toptal.com/developers/gitignore/api/node,vscode
+# Edit at https://www.toptal.com/developers/gitignore?templates=node,vscode
 
 ### Node ###
 # Logs
@@ -74,9 +43,11 @@ bower_components
 build/Release
 
 # Dependency directories
+node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
+typings/
 
 # TypeScript cache
 *.tsbuildinfo
@@ -142,22 +113,6 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
-### react ###
-.DS_*
-**/*.backup.*
-**/*.back.*
-
-node_modules
-
-*.sublime*
-
-psd
-thumb
-sketch
-
-# Created by https://www.toptal.com/developers/gitignore/api/vscode
-# Edit at https://www.toptal.com/developers/gitignore?templates=vscode
-
 ### vscode ###
 .vscode/*
 !.vscode/settings.json
@@ -166,6 +121,4 @@ sketch
 !.vscode/extensions.json
 *.code-workspace
 
-# End of https://www.toptal.com/developers/gitignore/api/vscode
-
-# End of https://www.toptal.com/developers/gitignore/api/node,react,angular
+# End of https://www.toptal.com/developers/gitignore/api/node,vscode

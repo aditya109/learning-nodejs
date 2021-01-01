@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "load": "concurrently \"loadtest -n 1000 http://localhost:3000\" \"loadtest -n 1000 http://localhost:3000\" \"loadtest -n 1000 http://localhost:3000\" \"loadtest -n 1000 http://localhost:3000\" \"loadtest -n 1000 http://localhost:3000\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "node-localstorage": "^2.1.6"
+  },
+  "devDependencies": {
+    "loadtest": "^5.1.2"
   }
 }
