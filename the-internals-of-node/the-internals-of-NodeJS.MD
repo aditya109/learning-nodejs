@@ -8,16 +8,16 @@
 👉 V8(function to run the code outside the terminal) + libuv(C++ OSP which provides OS system function access like file system and networking, some parts of concurrency, etc.)
 ```
 
-**Purpose of NodeJS** like why don't we directly use V8 and libuv
+**Purpose of NodeJS** like why don't we directly use `V8` and `libuv`
 
-1.  With V8 (= 30% JS + 70% C++) and libuv (= 100% C++), NodeJS(50% JS + 50% C++) gives us interface in JS.
-2. NodeJS provides us with a consistent API like *http*, *fs*, *crypto* and *path*.
+1.  With `V8` (= 30% JS + 70% C++) and `libuv` (= 100% C++), NodeJS(50% JS + 50% C++) gives us interface in JS.
+2. NodeJS provides us with a consistent API like `http`, `fs`, `crypto` and `path`.
 
 ## Module Implementation
 
 1. Pick a function in Node standard library
 2. Find where its implemented in the Node source code
-3. See how V8 and libuv are used to implement that function
+3. See how `V8` and `libuv` are used to implement that function
 
 ```
 👇 JavaScript Code We Write 
@@ -111,8 +111,6 @@ Node Event Loop 👉 Single Threaded
 
 Some of Node Framework/Standard Library 👉 Not Single Threaded
 ```
-
-
 
 Let's explain it using code:
 
