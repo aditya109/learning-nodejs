@@ -494,7 +494,3 @@ Try hitting the following URLs:
   ```json
   [{"name":"WDJ","shortname":"wdj","title":"Art in Full Bloom","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"},{"name":"Santa Clause","shortname":"santa_clause","title":"Deep Sea Wonders","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"},{"name":"Willy Wonka","shortname":"wonka","title":"The Art of Abstract","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"}]
   ```
-
-  
-
-
