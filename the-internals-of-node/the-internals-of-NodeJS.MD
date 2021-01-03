@@ -1,6 +1,20 @@
 # Internals of NodeJS
 
-[TOC]
+### Table of Contents
+
+- [Module Implementation](#module-implementation)
+- [NodeJS Threading](#nodejs-threading)
+  * [Thread Scheduling](#thread-scheduling)
+  * [NodeJS Event Loop](#nodejs-event-loop)
+    + [Event Loop Simulation](#event-loop-simulation)
+    + [Is Node Single Really Threaded?](#is-node-single-really-threaded-)
+    + [Thread-Pools with Multithreading](#thread-pools-with-multithreading)
+    + [Changing Threadpool Size](#changing-threadpool-size)
+  * [Explaining OS Operations](#explaining-os-operations)
+    + [Libuv OS Delegations](#libuv-os-delegations)
+  * [Crazy Node Behavior](#crazy-node-behavior)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 ```
 👇JavaScript Code We Write  
@@ -106,7 +120,7 @@ while (shouldContinue()) {
 
 #### Is Node Single Really Threaded?
 
-**Answer: **
+**Answer:**
 
 ```
 Node Event Loop 👉 Single Threaded
@@ -537,10 +551,6 @@ FS: 682
 1  Hash : 722
 2  Hash : 729
 ```
-
-
-
-
 
 
 
