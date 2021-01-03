@@ -230,7 +230,7 @@ module.exports = FeedbackService;
 ```
 
 ```js
-// SpeakerService.js
+// SpeakersService.js
 const fs = require('fs');
 const util = require('util');
 
@@ -360,19 +360,24 @@ const express = require('express');
 const path = require('path');
 
 const FeedbackService = require('./services/FeedbackService');
-const SpeakerService = require('./services/SpeakerService');
+const SpeakersService = require('./services/SpeakersService');
 
 const feedbackService = new FeedbackService('./data/feedback.json');
-const speakerService = new SpeakerService('./data/speakers.json');
+const speakersService = new SpeakersService('./data/speakers.json');
 
 let routes = require('./routes');
 
 const app = express();
 const port = 3000;
 
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, "./views"));
+
+app.use(express.static(path.join(__dirname, "./static")));
+
 app.use('/', routes({
         feedbackService,
-        speakerService
+        speakersService
 }));
 
 app.listen(port, () => {
@@ -384,7 +389,6 @@ Let's write our `index.js` so that it is extensible.
 
 ```js
 // index.js
-
 const express = require('express');
 const router = express.Router();
 
@@ -405,7 +409,6 @@ Now writing our routes `feedback.js` and `speakers.js`.
 
 ```js
 // feedback.js
-
 const express = require('express');
 const router = express.Router();
 
@@ -430,10 +433,10 @@ const express = require('express');
 const router = express.Router();
 
 module.exports = (params) => {
-        const { speakerService } = params;
+        const { speakersService } = params;
 
         router.get('/', async (req, res) => {
-                const speakers = await speakerService.getList();
+                const speakers = await speakersService.getList();
                 return res.json(speakers);
         });
 
@@ -482,15 +485,16 @@ Try hitting the following URLs:
 
 - http://localhost:3000/feedback:
 
-  ```
+  ```json
   [{"name":"wdj","email":"wdj@gmail.com","title":"WDJ TItltw","message":"WDJ message"},{"name":"sdfg","email":"sdfg@gmail.com","title":"Home &amp; Kitchen","message":"thids idfg kn sdfg"},{"name":"WDJ","email":"wdj@gmail.com","title":"some title","message":"this is meesagee from postman"},{"name":"wdj","email":"wdj@gmail.com","title":"some title","message":"Wdj was here"},{"name":"sdfg","email":"sdfgsdfg@gmail.com","title":"asdfgsdfg","message":"sfdghdfghdfgh"},{"name":"willy winka","email":"willy@aol.com","title":"somw tilte","message":"this is a message"},{"name":"Willy","email":"test@test2.com","title":"Final message","message":"This page is finished now"},{"name":"Willy","email":"test@test.com","title":"SPA Feedback","message":"This should now work"},{"name":"Willy","email":"test@test.com","title":"REST Title Test","message":"This was sent via REST"},{"name":"Willy","email":"test@test.com","title":"This was very nice","message":"I will come again next week!"},{"name":"Santa","email":"santa@gmail.com","title":"Best Meetup Ever","message":"I really love this meetup. Please don't let it end."},{"name":"WDJ","email":"wdj@gmail.com","title":"Meeting Time","message":"Would you consider moving the meeting time 30 minutes to about 6pm. It's tough to make it to the meetings on time right after work."},{"name":"Fred","email":"fred-jones@gmail.com","title":"Great Speaker","message":"I really enjoyed the speaker this month. Would love to hear another presentation."}]
   ```
 
 - http://localhost:3000/speakers:
 
-  ```
-  Home
+  ```json
+  [{"name":"WDJ","shortname":"wdj","title":"Art in Full Bloom","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"},{"name":"Santa Clause","shortname":"santa_clause","title":"Deep Sea Wonders","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"},{"name":"Willy Wonka","shortname":"wonka","title":"The Art of Abstract","summary":"Bacon ipsum dolor amet buffalo burgdoggen ribeye turkey kevin salami ground round pastrami pork belly filet mignon strip steak venison. Salami pastrami tenderloin pig cupim strip steak landjaeger frankfurter tongue. Meatball hamburger pig picanha landjaeger,"}]
   ```
 
-- 
+  
+
 
